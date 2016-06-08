@@ -8,9 +8,7 @@ import jade.core.AID;
 //#J2ME_EXCLUDE_FILE
 
 /**
- * Joined predicate used by chat ontology.
- * 
- * @author Michele Izzo - Telecomitalia
+ * Predicado de union usado por la ontologia del chat
  */
 
 @SuppressWarnings("serial")
