@@ -4,21 +4,9 @@ import jade.MicroBoot;
 import jade.core.MicroRuntime;
 import jade.core.Agent;
 import jade.util.leap.Properties;
-
-//#MIDP_EXCLUDE_BEGIN
 import java.awt.*;
 import java.awt.event.*;
-//#MIDP_EXCLUDE_END
-/*#MIDP_INCLUDE_BEGIN
-import javax.microedition.midlet.*;
-import javax.microedition.lcdui.*;
-#MIDP_INCLUDE_END*/
 
-/**
-   Startup class for the chat application
-   @author Giovanni Caire - TILAB
- */
-//#MIDP_EXCLUDE_BEGIN
 public class Start extends MicroBoot {
   public static void main(String args[]) {
   	MicroBoot.main(args);
@@ -88,62 +76,12 @@ public class Start extends MicroBoot {
 			return new Dimension(x, y);
 		}
   }
-//#MIDP_EXCLUDE_END
-/*#MIDP_INCLUDE_BEGIN
-public class Start extends MicroBoot implements CommandListener {
-  private final Command okCommand = new Command("OK", Command.OK, 1);
-  private final Command cancelCommand = new Command("Cancel", Command.CANCEL, 1);
-  private Form form;
-  private TextField tf;
-  private StringItem si;
-  	
-  public void startApp() throws MIDletStateChangeException {
-  	super.startApp();
-  	
-    form = new Form("Enter nickname:");
-    Display.getDisplay(Agent.midlet).setCurrent(form);    
-    tf = new TextField(null, null, 32, TextField.ANY);
-    form.append(tf);
-    si = new StringItem(null, null);
-    form.append(si);
-    
-    form.addCommand(okCommand);
-    form.addCommand(cancelCommand);
-    form.setCommandListener(this);
-  }
-
-  public void commandAction(Command c, Displayable d) {
-    if (c == okCommand) {
-    	String name = tf.getString();	
-    	if (!checkName(name)) {
-    		si.setText("The nickname must be composed of letters and digits only");
-    	}
-    	else {
-    		try {
-    			si.setText("Joining chat. Please wait...");
-	    		MicroRuntime.startAgent(name, "chat.client.agent.ChatClientAgent", null);
-    		}
-    		catch (Exception e) {
-    			si.setText("Nickname already in use");
-    		}
-    	}
-    }
-    else if (c == cancelCommand) {
-    	MicroRuntime.stopJADE();
-    }
-  }
-  
-  protected void customize(Properties p) {
-  	p.setProperty("exitwhenempty", "true");
-	}
-#MIDP_INCLUDE_END*/
   
   private static boolean checkName(String name) {
   	if (name == null || name.trim().equals("")) {
   		return false;
   	}
-  	// FIXME: should also check that name is composed 
-  	// of letters and digits only 
+  	// debería revisar que el nombre esta compuesto solo de letras y digitos 
   	return true;
   }
 }
