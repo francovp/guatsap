@@ -1,22 +1,55 @@
+/*****************************************************************
+JADE - Java Agent DEvelopment Framework is a framework to develop 
+multi-agent systems in compliance with the FIPA specifications.
+Copyright (C) 2000 CSELT S.p.A. 
+
+GNU Lesser General Public License
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation, 
+version 2.1 of the License. 
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the
+Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA  02111-1307, USA.
+*****************************************************************/
+
 package chat.client;
+
+//#MIDP_EXCLUDE_FILE
 
 import java.awt.*;
 import java.awt.event.*;
 
-import chat.client.agent.ChatClientAgent;
+import javax.swing.JFrame;
 
-public class AWTChatGui extends Frame implements ChatGui {
+import chat.client.agent.ChatClientAgent;
+import javax.swing.JButton;
+
+/**
+   @author Giovanni Caire - TILAB
+ */
+public class AWTChatGui extends JFrame implements ChatGui {
 	private ChatClientAgent myAgent;
 	private TextField writeTf;
 	private TextArea allTa;
 	private ParticipantsFrame participantsFrame;
+	private Button b_1;
 	
 	public AWTChatGui(ChatClientAgent a) {
 		myAgent = a;
 		
 		setTitle("Chat: "+myAgent.getLocalName());
-		setSize(getProperSize(256, 320));
+		setSize(new Dimension(286, 284));
 		Panel p = new Panel();
+		p.setBounds(0, 0, 270, 22);
 		p.setLayout(new BorderLayout());
 		writeTf = new TextField();
 		p.add(writeTf, BorderLayout.CENTER);
@@ -30,23 +63,36 @@ public class AWTChatGui extends Frame implements ChatGui {
 		  	}
 			} 
 		} );
+		getContentPane().setLayout(null);
 		p.add(b, BorderLayout.EAST);
-		add(p, BorderLayout.NORTH);
+		getContentPane().add(p);
 		
 		allTa = new TextArea();
+		allTa.setBounds(0, 22, 270, 183);
 		allTa.setEditable(false);
 		allTa.setBackground(Color.white);
-		add(allTa, BorderLayout.CENTER);
+		getContentPane().add(allTa);
 		
-		b = new Button("Participants");
-		b.addActionListener(new ActionListener() {
+		b_1 = new Button("Participants");
+		b_1.setBounds(0, 205, 138, 40);
+		b_1.setPreferredSize(new Dimension(40,40));
+		b_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!participantsFrame.isVisible()) {
 					participantsFrame.setVisible(true);
 				}	
 			} 
 		} );
-		add(b, BorderLayout.SOUTH);
+		getContentPane().add(b_1);
+		
+		Button b2 = new Button("Mover");
+		b2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		b2.setActionCommand("Mover");
+		b2.setBounds(138, 205, 132, 40);
+		getContentPane().add(b2);
 		
 		participantsFrame = new ParticipantsFrame(this, myAgent.getLocalName());
 		
