@@ -72,7 +72,7 @@ public class MobileAgentGui extends JFrame implements ActionListener
 
 
 	// Constructor
-	MobileAgentGui(MobileAgent a)
+	public MobileAgentGui(MobileAgent a)
 	{
 		super();
 		myAgent = a;

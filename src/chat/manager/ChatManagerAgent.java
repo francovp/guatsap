@@ -32,13 +32,14 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import chat.mobile.MobileAgent;
 import chat.ontology.*;
 
 /**
    este agente mantiene conocimiento sobre los agentes que estén en el chat
    e informa cuando alguien se conecta o desconecta
  */
-public class ChatManagerAgent extends Agent implements SubscriptionManager {
+public class ChatManagerAgent extends Agent implements SubscriptionManager{
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();

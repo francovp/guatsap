@@ -27,25 +27,13 @@ package chat.client;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumn;
 
 import chat.client.agent.ChatClientAgent;
-import chat.mobile.LocationTableModel;
 import chat.mobile.MobileAgent;
-import jade.core.Location;
-import jade.gui.GuiEvent;
+import chat.mobile.MobileAgentGui;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
 /**
@@ -53,30 +41,18 @@ import javax.swing.JButton;
  */
 public class AWTChatGui extends JFrame implements ChatGui {
 	private ChatClientAgent myAgent;
-	private MobileAgent myAgent2;
 	private TextField writeTf;
 	private TextArea allTa;
 	private ParticipantsFrame participantsFrame;
+	private MobileAgentGui mobileFrame;
 	private Button b_1;
-	
-	private LocationTableModel visitedSiteListModel;
-	private JTable            visitedSiteList;
-	private LocationTableModel availableSiteListModel;
-	private JTable            availableSiteList;
-	private JTextField counterText; 
-	
-	
-	private static String MOVELABEL = "MOVE";
-	private static String CLONELABEL = "CLONE";
-	private static String EXITLABEL = "EXIT";
-	private static String PAUSELABEL = "Stop Counter";
-	private static String CONTINUELABEL = "Continue Counter";
-	private static String REFRESHLABEL = "Refresh Locations";
 	
 	public AWTChatGui(ChatClientAgent a) {
 		myAgent = a;
+		MobileAgent mobileAgent = new MobileAgent();
+		
 		setTitle("Chat: "+myAgent.getLocalName());
-		setSize(new Dimension(538, 517));
+		setSize(new Dimension(286, 284));
 		Panel p = new Panel();
 		p.setBounds(0, 0, 270, 22);
 		p.setLayout(new BorderLayout());
@@ -96,81 +72,6 @@ public class AWTChatGui extends JFrame implements ChatGui {
 		p.add(b, BorderLayout.EAST);
 		getContentPane().add(p);
 		
-		
-		////////////////////////////////
-		JPanel main = new JPanel();
-		main.setLayout(new BoxLayout(main,BoxLayout.Y_AXIS));
-
-		JPanel counterPanel = new JPanel();
-		counterPanel.setLayout(new BoxLayout(counterPanel, BoxLayout.X_AXIS));
-		
-		JButton pauseButton = new JButton("STOP COUNTER");
-		pauseButton.addActionListener((ActionListener) this);
-		JButton continueButton = new JButton("CONTINUE COUNTER");
-		continueButton.addActionListener((ActionListener) this);
-		JLabel counterLabel = new JLabel("Counter value: ");
-		counterText = new JTextField();
-		counterPanel.add(pauseButton);
-		counterPanel.add(continueButton);
-		counterPanel.add(counterLabel);
-		counterPanel.add(counterText);
-		
-		main.add(counterPanel);
-		//////////////////////////////
-		
-///////////////////////////////////////////////////
-// Add the list of available sites to the NORTH part 
-availableSiteListModel = new LocationTableModel();
-availableSiteList = new JTable(availableSiteListModel);
-availableSiteList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-JPanel availablePanel = new JPanel();
-availablePanel.setLayout(new BorderLayout());
-
-JScrollPane avPane = new JScrollPane();
-avPane.getViewport().setView(availableSiteList);
-availablePanel.add(avPane, BorderLayout.CENTER);
-availablePanel.setBorder(BorderFactory.createTitledBorder("Available Locations"));
-availableSiteList.setRowHeight(20);
-
-main.add(availablePanel);
-
-TableColumn c;
-c = availableSiteList.getColumn(availableSiteList.getColumnName(0));
-c.setHeaderValue("ID");
-c = availableSiteList.getColumn(availableSiteList.getColumnName(1));
-c.setHeaderValue("Name");
-c = availableSiteList.getColumn(availableSiteList.getColumnName(2));
-c.setHeaderValue("Protocol");
-c = availableSiteList.getColumn(availableSiteList.getColumnName(3));
-c.setHeaderValue("Address");
-
-///////////////////////////////////////////////////
-// Add the list of visited sites to the CENTER part 
-JPanel visitedPanel = new JPanel();
-visitedPanel.setLayout(new BorderLayout());
-visitedSiteListModel = new LocationTableModel();
-visitedSiteList = new JTable(visitedSiteListModel);
-JScrollPane pane = new JScrollPane();
-pane.getViewport().setView(visitedSiteList);
-visitedPanel.add(pane,BorderLayout.CENTER);
-visitedPanel.setBorder(BorderFactory.createTitledBorder("Visited Locations"));
-visitedSiteList.setRowHeight(20);
-
-main.add(visitedPanel);
-
-// Column names
-
-c = visitedSiteList.getColumn(visitedSiteList.getColumnName(0));
-c.setHeaderValue("ID");
-c = visitedSiteList.getColumn(visitedSiteList.getColumnName(1));
-c.setHeaderValue("Name");
-c = visitedSiteList.getColumn(visitedSiteList.getColumnName(2));
-c.setHeaderValue("Protocol");
-c = visitedSiteList.getColumn(visitedSiteList.getColumnName(3));
-c.setHeaderValue("Address");
-		
-		
 		allTa = new TextArea();
 		allTa.setBounds(0, 22, 270, 183);
 		allTa.setEditable(false);
@@ -189,69 +90,18 @@ c.setHeaderValue("Address");
 		} );
 		getContentPane().add(b_1);
 		
-
-		Button b2 = new Button(MOVELABEL);
+		mobileFrame = new MobileAgentGui (mobileAgent);
+		Button b2 = new Button("Mover");
 		b2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String command = e.getActionCommand();
-
-				// MOVE
-				if      (command.equalsIgnoreCase(MOVELABEL)) {
-				  Location dest;
-				  int sel = availableSiteList.getSelectedRow();
-				  if (sel >= 0)
-				    dest = availableSiteListModel.getElementAt(sel);
-				  else
-				    dest = availableSiteListModel.getElementAt(0);
-		              
-				  GuiEvent ev = new GuiEvent((Object) this,myAgent2.MOVE_EVENT);
-				  ev.addParameter(dest);
-		      myAgent2.postGuiEvent(ev);	 
-				}
-				else if (command.equalsIgnoreCase(PAUSELABEL)) {
-		      GuiEvent ev = new GuiEvent(null,myAgent2.STOP_EVENT);
-				  myAgent2.postGuiEvent(ev);
-				}
-				else if (command.equalsIgnoreCase(CONTINUELABEL)) {
-				     GuiEvent ev = new GuiEvent(null,myAgent2.CONTINUE_EVENT);
-				     myAgent2.postGuiEvent(ev);
-				}
-				else if (command.equalsIgnoreCase(REFRESHLABEL)) {
-				     GuiEvent ev = new GuiEvent(null,myAgent2.REFRESH_EVENT); 
-		         myAgent2.postGuiEvent(ev);
-				}
+			public void actionPerformed(ActionEvent arg0) {
+				if (!mobileFrame.isVisible()) {
+					mobileFrame.setVisible(true);
+				}	
 			}
 		});
 		b2.setActionCommand("Mover");
-		b2.setBounds(138, 205, 70, 40);
+		b2.setBounds(138, 205, 132, 40);
 		getContentPane().add(b2);
-		
-		Button button = new Button(CLONELABEL);
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Location dest;
-				  int sel = availableSiteList.getSelectedRow();
-				  if (sel >= 0)
-				    dest = availableSiteListModel.getElementAt(sel);
-				  else
-				    dest = availableSiteListModel.getElementAt(0);
-				  GuiEvent ev = new GuiEvent((Object) this, myAgent2.CLONE_EVENT);
-				  ev.addParameter(dest);
-		      myAgent2.postGuiEvent(ev);
-			}
-		});
-		button.setBounds(207, 205, 63, 40);
-		getContentPane().add(button);
-		
-		Button button_1 = new Button(EXITLABEL);
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GuiEvent ev = new GuiEvent(null,myAgent.EXIT);
-				myAgent2.postGuiEvent(ev);
-			}
-		});
-		button_1.setBounds(0, 245, 270, 46);
-		getContentPane().add(button_1);
 		
 		participantsFrame = new ParticipantsFrame(this, myAgent.getLocalName());
 		
@@ -263,20 +113,6 @@ c.setHeaderValue("Address");
 		
 		show();
 	}
-	
-	void displayCounter(int value){
-	    counterText.setText(Integer.toString(value));
-	    //counterText.fireActionPerformed();
-	  }
-
-	  public void updateLocations(Iterator list) {
-	    availableSiteListModel.clear();
-	    for ( ; list.hasNext(); ) {
-	    	Object obj = list.next();
-	      availableSiteListModel.add((Location) obj);
-	    }
-	    availableSiteListModel.fireTableDataChanged();
-	  }
 	
 	public void notifyParticipantsChanged(String[] names) {
 		if (participantsFrame != null) {
@@ -294,27 +130,6 @@ c.setHeaderValue("Address");
 		int y = (screenSize.height < maxY ? screenSize.height : maxY);
 		return new Dimension(x, y);
 	}
-	
-	void showCorrect()
-	{
-		///////////////////////////////////////////
-		// Arrange and display GUI window correctly
-		pack();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int centerX = (int)screenSize.getWidth() / 2;
-		int centerY = (int)screenSize.getHeight() / 2;
-		setLocation(centerX - getWidth() / 2, centerY - getHeight() / 2);
-		show();
-	}
-	
-	public void addVisitedSite(Location site)
-	{
-		visitedSiteListModel.add(site);
-		visitedSiteListModel.fireTableDataChanged();
-
-	}
-	
-	
 	
 	public void dispose() {
 		participantsFrame.dispose();

@@ -3,7 +3,9 @@ package chat.client;
 import java.awt.*;
 import java.awt.event.*;
 
-class ParticipantsFrame extends Frame {
+import javax.swing.JFrame;
+
+class ParticipantsFrame extends JFrame {
 	private AWTChatGui parent;
 	private TextArea participants;
 	private String me;
@@ -13,13 +15,13 @@ class ParticipantsFrame extends Frame {
 		this.me = me;
 		
 		setTitle("Participants: ");
-		setSize(parent.getSize());
+		setSize(new Dimension(197, 198));
 		
 		participants = new TextArea();
 		participants.setEditable(false);
 		participants.setBackground(Color.white);
 		participants.setText(me+"\n");
-		add(participants, BorderLayout.CENTER);
+		getContentPane().add(participants, BorderLayout.CENTER);
 				
 		Button b = new Button("Close");
 		b.addActionListener(new ActionListener() {
@@ -28,7 +30,7 @@ class ParticipantsFrame extends Frame {
 			} 
 		} );
 		
-		add(b, BorderLayout.SOUTH);
+		getContentPane().add(b, BorderLayout.SOUTH);
 		addWindowListener(new	WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				setVisible(false);
