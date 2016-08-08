@@ -43,6 +43,12 @@ public class ChatClientAgent extends Agent {
 
 	private static final String CHAT_ID = "__chat__";
 	private static final String CHAT_MANAGER_NAME = "manager";
+	public static final int EXIT = 1000;
+	public static final int MOVE_EVENT = 1001;
+	public static final int STOP_EVENT = 1002;
+	public static final int CONTINUE_EVENT = 1003;
+	public static final int REFRESH_EVENT = 1004;
+	public static final int CLONE_EVENT = 1005;
 
 	private ChatGui myGui;
 	private Set participants = new SortedSetImpl();

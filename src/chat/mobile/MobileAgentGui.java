@@ -175,6 +175,23 @@ public class MobileAgentGui extends JFrame implements ActionListener
 		
 		getContentPane().add(main, BorderLayout.CENTER);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
   void displayCounter(int value){
     counterText.setText(Integer.toString(value));
