@@ -31,10 +31,12 @@ import java.awt.event.*;
 import javax.swing.JFrame;
 
 import chat.client.agent.ChatClientAgent;
-import chat.mobile.MobileAgent;
-import chat.mobile.MobileAgentGui;
+import chat.manager.MobileAgentGui;
 
 import javax.swing.JButton;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 /**
    @author Giovanni Caire - TILAB
@@ -49,16 +51,15 @@ public class AWTChatGui extends JFrame implements ChatGui {
 	
 	public AWTChatGui(ChatClientAgent a) {
 		myAgent = a;
-		MobileAgent mobileAgent = new MobileAgent();
 		
 		setTitle("Chat: "+myAgent.getLocalName());
-		setSize(new Dimension(286, 284));
+		setSize(new Dimension(286, 293));
 		Panel p = new Panel();
-		p.setBounds(0, 0, 270, 22);
-		p.setLayout(new BorderLayout());
+		p.setBounds(0, 178, 270, 26);
 		writeTf = new TextField();
-		p.add(writeTf, BorderLayout.CENTER);
-		Button b = new Button("Send");
+		writeTf.setBounds(1, 0, 202, 26);
+		Button b = new Button("Enviar");
+		b.setBounds(204, 0, 63, 26);
 		b.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		  	String s = writeTf.getText();
@@ -68,18 +69,14 @@ public class AWTChatGui extends JFrame implements ChatGui {
 		  	}
 			} 
 		} );
-		getContentPane().setLayout(null);
-		p.add(b, BorderLayout.EAST);
-		getContentPane().add(p);
 		
 		allTa = new TextArea();
-		allTa.setBounds(0, 22, 270, 183);
+		allTa.setBounds(0, 0, 270, 172);
 		allTa.setEditable(false);
 		allTa.setBackground(Color.white);
-		getContentPane().add(allTa);
 		
-		b_1 = new Button("Participants");
-		b_1.setBounds(0, 205, 138, 40);
+		b_1 = new Button("Participantes");
+		b_1.setBounds(73, 210, 129, 35);
 		b_1.setPreferredSize(new Dimension(40,40));
 		b_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -88,20 +85,26 @@ public class AWTChatGui extends JFrame implements ChatGui {
 				}	
 			} 
 		} );
+		p.setLayout(null);
+		p.add(writeTf);
+		p.add(b);
+		getContentPane().setLayout(null);
+		getContentPane().add(allTa);
+		getContentPane().add(p);
 		getContentPane().add(b_1);
 		
-		mobileFrame = new MobileAgentGui (mobileAgent);
-		Button b2 = new Button("Mover");
-		b2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (!mobileFrame.isVisible()) {
-					mobileFrame.setVisible(true);
-				}	
-			}
-		});
-		b2.setActionCommand("Mover");
-		b2.setBounds(138, 205, 132, 40);
-		getContentPane().add(b2);
+//		mobileFrame = MobileAgent.getGui();
+//		Button b2 = new Button("Mover");
+//		b2.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				if (!mobileFrame.isVisible()) {
+//					mobileFrame.setVisible(true);
+//				}	
+//			}
+//		});
+//		b2.setActionCommand("Mover");
+//		b2.setBounds(138, 205, 132, 40);
+//		getContentPane().add(b2);
 		
 		participantsFrame = new ParticipantsFrame(this, myAgent.getLocalName());
 		

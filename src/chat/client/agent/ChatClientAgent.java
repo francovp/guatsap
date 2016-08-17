@@ -36,7 +36,7 @@ import chat.ontology.ChatOntology;
  * 	usuario a los otros participantes del chat
  *
  */
-public class ChatClientAgent extends Agent {
+public class ChatClientAgent extends Agent{
 	private static final long serialVersionUID = 1594371294421614291L;
 
 	private Logger logger = Logger.getMyLogger(this.getClass().getName());

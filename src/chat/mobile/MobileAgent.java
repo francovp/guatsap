@@ -63,9 +63,11 @@ between the agent and its GUI is based on event passing.
 @version $Date: 2004-08-20 12:15:13 +0200 (ven, 20 ago 2004) $ $Revision: 5283 $
 */
 public class MobileAgent extends GuiAgent {
+	private static final long serialVersionUID = 1594371294421614292L;
+	
   int     cnt;   // this is the counter
   public boolean cntEnabled;  // this flag indicates if counting is enabled
-  transient protected MobileAgentGui gui;  // this is the gui
+  public static MobileAgentGui gui;  // this is the gui
   Location nextSite;  // this variable holds the destination site
 
   // These constants are used by the Gui to post Events to the Agent
@@ -78,7 +80,7 @@ public class MobileAgent extends GuiAgent {
 
   // this vector contains the list of visited locations
   Vector visitedLocations = new Vector();
-
+	
   public void setup() {
 	  // register the SL0 content language
 	  getContentManager().registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
@@ -86,8 +88,8 @@ public class MobileAgent extends GuiAgent {
 	  getContentManager().registerOntology(MobilityOntology.getInstance());
 
 	  // creates and shows the GUI
-	  gui = new MobileAgentGui(this);
-	  gui.setVisible(true); 
+	  this.gui = new MobileAgentGui(this);
+	  this.gui.setVisible(true); 
 
 	  // get the list of available locations and show it in the GUI
 	  addBehaviour(new GetAvailableLocationsBehaviour(this));
@@ -105,6 +107,10 @@ public class MobileAgent extends GuiAgent {
 	  addBehaviour(b2);	
 	}
 
+  	public static MobileAgentGui getGui(){
+  		return gui;
+  	}
+  	
 	public void takeDown() {
 	  if (gui!=null) {
             gui.dispose();

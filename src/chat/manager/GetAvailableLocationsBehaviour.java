@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
 *****************************************************************/
 
-package chat.mobile;
+package chat.manager;
 
 import jade.util.leap.*;
 
@@ -53,7 +53,7 @@ public class GetAvailableLocationsBehaviour extends SimpleAchieveREInitiator {
 
     private ACLMessage request;
  
-   public GetAvailableLocationsBehaviour(MobileAgent chatManagerAgent) {
+   public GetAvailableLocationsBehaviour(ChatManagerAgent chatManagerAgent) {
      // call the constructor of FipaRequestInitiatorBehaviour
      super(chatManagerAgent, new ACLMessage(ACLMessage.REQUEST));
      request = (ACLMessage)getDataStore().get(REQUEST_KEY);
@@ -101,7 +101,7 @@ public class GetAvailableLocationsBehaviour extends SimpleAchieveREInitiator {
      try {
        Result results = (Result)myAgent.getContentManager().extractContent(inform);
        //update the GUI
-       ((MobileAgent)myAgent).gui.updateLocations(results.getItems().iterator());
+       ((ChatManagerAgent)myAgent).gui.updateLocations(results.getItems().iterator());
      }
      catch(Exception e) {
        e.printStackTrace();

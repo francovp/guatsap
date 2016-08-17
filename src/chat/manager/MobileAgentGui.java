@@ -21,7 +21,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
 *****************************************************************/
 
-package chat.mobile;
+package chat.manager;
 
 // Import required Java classes 
 import jade.core.Location;
@@ -54,7 +54,7 @@ import javax.swing.table.TableColumn;
 public class MobileAgentGui extends JFrame implements ActionListener
 {
 
-  private MobileAgent          myAgent;
+  private ChatManagerAgent          myAgent;
   private LocationTableModel visitedSiteListModel;
   private JTable            visitedSiteList;
   private LocationTableModel availableSiteListModel;
@@ -69,7 +69,7 @@ public class MobileAgentGui extends JFrame implements ActionListener
   private static String REFRESHLABEL = "Refresh Locations";
 
 	// Constructor
-	protected MobileAgentGui(MobileAgent chatManagerAgent)
+	protected MobileAgentGui(ChatManagerAgent chatManagerAgent)
 	{
 		super();
 		myAgent = chatManagerAgent;

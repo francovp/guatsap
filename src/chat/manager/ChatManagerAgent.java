@@ -2,9 +2,7 @@
 package chat.manager;
 
 
-import jade.core.Agent;
-import jade.core.AID;
-
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -19,9 +17,13 @@ import jade.proto.SubscriptionResponder.SubscriptionManager;
 import jade.proto.SubscriptionResponder.Subscription;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.FailureException;
 
 import jade.domain.introspection.IntrospectionOntology;
+import jade.domain.mobility.MobilityOntology;
+import jade.gui.GuiAgent;
+import jade.gui.GuiEvent;
 import jade.domain.introspection.Event;
 import jade.domain.introspection.DeadAgent;
 import jade.domain.introspection.AMSSubscriber;
@@ -29,21 +31,39 @@ import jade.domain.introspection.AMSSubscriber;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import chat.mobile.MobileAgent;
 import chat.ontology.*;
+
+import jade.core.*;
 
 /**
    este agente mantiene conocimiento sobre los agentes que estén en el chat
    e informa cuando alguien se conecta o desconecta
  */
-public class ChatManagerAgent extends Agent implements SubscriptionManager{
+public class ChatManagerAgent extends GuiAgent implements SubscriptionManager{
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private AMSSubscriber myAMSSubscriber;
+	
+	int     cnt;   // this is the counter
+	  public boolean cntEnabled;  // this flag indicates if counting is enabled
+	  public static MobileAgentGui gui;  // this is the gui
+	  Location nextSite;  // this variable holds the destination site
+	  
+	  // These constants are used by the Gui to post Events to the Agent
+	  public static final int EXIT = 1000;
+	  public static final int MOVE_EVENT = 1001;
+	  public static final int STOP_EVENT = 1002;
+	  public static final int CONTINUE_EVENT = 1003;
+	  public static final int REFRESH_EVENT = 1004;
+	  public static final int CLONE_EVENT = 1005;
+	
+	// this vector contains the list of visited locations
+	  Vector visitedLocations = new Vector();
 
 	protected void setup() {
 		//Se prepara para aceptar suscripciones de participantes del chat
@@ -85,14 +105,31 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager{
 			}
 		};
 		addBehaviour(myAMSSubscriber);
-	}
+		
+		// register the SL0 content language
+		  getContentManager().registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
+		  // register the mobility ontology
+		  getContentManager().registerOntology(MobilityOntology.getInstance());
 
-	protected void takeDown() {
-		// Desuscribirse del AMS
+		  // creates and shows the GUI
+		  this.gui = new MobileAgentGui(this);
+		  this.gui.setVisible(true); 
+
+		  // get the list of available locations and show it in the GUI
+		  addBehaviour(new GetAvailableLocationsBehaviour(this));
+
+		  // initialize the counter and the flag
+		  cnt = 0;
+		  cntEnabled = true;
+
+		  ///////////////////////
+		  // Add agent behaviours to increment the counter and serve
+		  // incoming messages
+		  Behaviour b1 = new CounterBehaviour(this);
+		  addBehaviour(b1);	
+		  Behaviour b2 = new ServeIncomingMessagesBehaviour(this);
+		  addBehaviour(b2);	
 		
-		send(myAMSSubscriber.getCancel());
-		
-		//Arreglo: Debe informar de participantes actuales (De haberlos)
 	}
 
 	/////////////////////////////////////////////////////
@@ -181,5 +218,145 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager{
 			}
 		}
 		return false;
+	}
+	
+	public static MobileAgentGui getGui(){
+  		return gui;
+  	}
+  	
+	public void takeDown() {
+	  if (gui!=null) {
+            gui.dispose();
+	    gui.setVisible(false);
+	  }
+          System.out.println(getLocalName()+" is now shutting down.");
+	}
+
+  /**
+   * This method stops the counter by disabling the flag
+   */
+   void stopCounter(){
+    cntEnabled = false;
+   }
+
+  /**
+   * This method resume counting by enabling the flag
+   */
+   void continueCounter(){
+     cntEnabled = true;
+   }
+
+  /**
+   * This method displays the counter in the GUI
+   */
+   void displayCounter(){
+     gui.displayCounter(cnt);
+   }
+  
+   
+protected void beforeClone() {
+  System.out.println(getLocalName()+" is now cloning itself.");
+}
+
+protected void afterClone() {
+  System.out.println(getLocalName()+" has cloned itself.");
+  afterMove();
+}
+  /**
+   * This method is executed just before moving the agent to another
+   * location. It is automatically called by the JADE framework.
+   * It disposes the GUI and prints a bye message on the standard output.
+   */
+	protected void beforeMove() 
+	{
+		gui.dispose();
+		gui.setVisible(false);
+		System.out.println(getLocalName()+" is now moving elsewhere.");
+	}
+
+  /**
+   * This method is executed as soon as the agent arrives to the new 
+   * destination.
+   * It creates a new GUI and sets the list of visited locations and
+   * the list of available locations (via the behaviour) in the GUI.
+   */
+   protected void afterMove() {
+     System.out.println(getLocalName()+" is just arrived to this location.");
+     // creates and shows the GUI
+     gui = new MobileAgentGui(this);
+     //if the migration is via RMA the variable nextSite can be null.
+     if(nextSite != null)
+     {
+     	visitedLocations.addElement(nextSite);
+      for (int i=0; i<visitedLocations.size(); i++)
+        gui.addVisitedSite((Location)visitedLocations.elementAt(i));
+     }
+     gui.setVisible(true); 	
+			
+     // Register again SL0 content language and JADE mobility ontology,
+     // since they don't migrate.
+     getContentManager().registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
+	 getContentManager().registerOntology(MobilityOntology.getInstance());
+     // get the list of available locations from the AMS.
+     // FIXME. This list might be stored in the Agent and migrates with it.
+     addBehaviour(new GetAvailableLocationsBehaviour(this));
+   }
+
+  public void afterLoad() {
+      afterClone();
+  }
+
+  public void beforeFreeze() {
+      beforeMove();
+  }
+
+  public void afterThaw() {
+      afterMove();
+  }
+
+  public void beforeReload() {
+      beforeMove();
+  }
+
+  public void afterReload() {
+      afterMove();
+  }
+
+
+	/////////////////////////////////
+	// GUI HANDLING
+		
+
+	// AGENT OPERATIONS FOLLOWING GUI EVENTS
+	protected void onGuiEvent(GuiEvent ev)
+	{
+		switch(ev.getType()) 
+		{
+		case EXIT:
+			gui.dispose();
+			gui = null;
+			doDelete();
+			break;
+		case MOVE_EVENT:
+      Iterator moveParameters = ev.getAllParameter();
+      nextSite =(Location)moveParameters.next();
+			doMove(nextSite);
+			break;
+		case CLONE_EVENT:
+			Iterator cloneParameters = ev.getAllParameter();
+			nextSite =(Location)cloneParameters.next();
+			doClone(nextSite,"clone"+cnt+"of"+getName());
+			break;
+   	case STOP_EVENT:
+		  stopCounter();
+		  break;
+		case CONTINUE_EVENT:
+		  continueCounter();
+		  break;
+		case REFRESH_EVENT:
+		  addBehaviour(new GetAvailableLocationsBehaviour(this));
+		  break;
+		}
+
 	}
 }
