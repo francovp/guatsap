@@ -12,6 +12,8 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.FIPANames;
+import jade.domain.mobility.MobilityOntology;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
@@ -62,6 +64,10 @@ public class ChatClientAgent extends Agent{
 		cm.registerLanguage(codec);
 		cm.registerOntology(onto);
 		cm.setValidationMode(false);
+		// register the SL0 content language
+		 cm.registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
+		  // register the mobility ontology
+		  cm.registerOntology(MobilityOntology.getInstance());
 
 		// Agregamos comportamientos iniciales
 		addBehaviour(new ParticipantsManager(this));
